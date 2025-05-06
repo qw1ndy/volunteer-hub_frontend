@@ -1,0 +1,49 @@
+.eventItem {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 1.5rem;
+}
+
+.eventItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-color: #4caf50;
+}
+
+.eventItem h5 {
+  color: #333;
+  font-weight: 600;
+}
+
+.eventItem p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.eventItem .badge {
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+.form-select,
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}

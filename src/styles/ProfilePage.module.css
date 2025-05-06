@@ -1,0 +1,161 @@
+.profileContainer {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-top: 2rem;
+}
+
+.profileHeader {
+  background-color: white;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profileImage {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f8f9fa;
+}
+
+.profileInfo {
+  padding-left: 1.5rem;
+}
+
+.profileName {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.profileLocation {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.profileBio {
+  color: #495057;
+  margin-bottom: 1.5rem;
+}
+
+.profileStats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3498db;
+}
+
+.statLabel {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.profileActions {
+  margin-top: 1rem;
+}
+
+.editButton {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.editButton:hover {
+  background-color: #2980b9;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+.skillsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.skillTag {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.eventCard {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.eventTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.eventDate {
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.eventStatus {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.statusActive {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.statusCompleted {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+@media (max-width: 768px) {
+  .profileHeader {
+    padding: 1.5rem;
+  }
+
+  .profileImage {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profileStats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .statItem {
+    text-align: left;
+  }
+}
