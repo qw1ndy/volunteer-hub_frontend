@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "U98utC0fWEPtrrjfB8eV/68i/Dvg9uJJ0XdC+4orBnQ=",
+  "Source": "Volunet.API",
+  "BasePath": "_content/Volunet.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
