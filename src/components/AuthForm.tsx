@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/AuthForm.module.css";
-import { authService } from "../services/api";
-import { RegisterData, AuthCredentials } from "../types/api";
 
 interface AuthFormProps {
   onClose: () => void;
@@ -9,14 +9,15 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState<RegisterData>({
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: "",
     confirmPassword: "",
   });
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { login, register } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,40 +29,34 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true);
+    setError("");
 
     try {
       if (isLogin) {
-        const { email, password } = formData;
-        await authService.login({ email, password });
+        await login(formData.email, formData.password);
       } else {
         if (formData.password !== formData.confirmPassword) {
           setError("Паролі не співпадають");
           return;
         }
-        await authService.register(formData);
+        await register(formData.email, formData.password);
       }
       onClose();
-      window.location.reload();
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Сталася помилка");
-    } finally {
-      setIsLoading(false);
+      navigate("/profile");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Сталася помилка");
     }
   };
 
   return (
-    <div className={styles.authModal}>
-      <div className={styles.authContent}>
+    <div className={styles.authForm}>
+      <div className={styles.formContainer}>
         <button className={styles.closeButton} onClick={onClose}>
           ×
         </button>
         <h2>{isLogin ? "Вхід" : "Реєстрація"}</h2>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-
-        <form onSubmit={handleSubmit} className={styles.authForm}>
+        {error && <div className={styles.error}>{error}</div>}
+        <form onSubmit={handleSubmit}>
           {!isLogin && (
             <div className={styles.formGroup}>
               <label htmlFor="name">Ім'я</label>
@@ -72,11 +67,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                disabled={isLoading}
               />
             </div>
           )}
-
           <div className={styles.formGroup}>
             <label htmlFor="email">Email</label>
             <input
@@ -86,10 +79,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
               value={formData.email}
               onChange={handleChange}
               required
-              disabled={isLoading}
             />
           </div>
-
           <div className={styles.formGroup}>
             <label htmlFor="password">Пароль</label>
             <input
@@ -99,13 +90,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
               value={formData.password}
               onChange={handleChange}
               required
-              disabled={isLoading}
             />
           </div>
-
           {!isLogin && (
             <div className={styles.formGroup}>
-              <label htmlFor="confirmPassword">Підтвердіть пароль</label>
+              <label htmlFor="confirmPassword">Підтвердження паролю</label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -113,35 +102,49 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                disabled={isLoading}
               />
             </div>
           )}
-
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isLoading}
-          >
-            {isLoading
-              ? "Завантаження..."
-              : isLogin
-              ? "Увійти"
-              : "Зареєструватися"}
+          <button type="submit" className={styles.submitButton}>
+            {isLogin ? "Увійти" : "Зареєструватися"}
           </button>
         </form>
-
-        <div className={styles.switchForm}>
-          <p>
-            {isLogin ? "Немає акаунту?" : "Вже є акаунт?"}
+        {isLogin && (
+          <div className={styles.testLogin}>
             <button
-              onClick={() => setIsLogin(!isLogin)}
-              className={styles.switchButton}
-              disabled={isLoading}
+              type="button"
+              onClick={async () => {
+                try {
+                  await login("test@example.com", "test123");
+                  onClose();
+                  navigate("/profile");
+                } catch (err) {
+                  setError(
+                    err instanceof Error ? err.message : "Сталася помилка"
+                  );
+                }
+              }}
+              className={styles.testLoginButton}
             >
-              {isLogin ? "Зареєструватися" : "Увійти"}
+              Тестовий вхід
             </button>
-          </p>
+            <p className={styles.testLoginInfo}>
+              Email: test@example.com
+              <br />
+              Пароль: test123
+            </p>
+          </div>
+        )}
+        <div className={styles.switchForm}>
+          <button
+            type="button"
+            onClick={() => setIsLogin(!isLogin)}
+            className={styles.switchButton}
+          >
+            {isLogin
+              ? "Немає акаунту? Зареєструватися"
+              : "Вже є акаунт? Увійти"}
+          </button>
         </div>
       </div>
     </div>

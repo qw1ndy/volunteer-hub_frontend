@@ -1,20 +1,20 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  location?: string;
-  bio?: string;
-  avatar?: string;
-}
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { authService } from "../services/authService";
+import { InfoResponse } from "../types/auth";
+import { logger } from "../utils/logger";
 
 interface AuthContextType {
-  user: User | null;
+  user: InfoResponse | null;
   isAuthenticated: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -23,84 +23,84 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<InfoResponse | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Перевірка токена при завантаженні
-    const token = localStorage.getItem("token");
-    if (token) {
-      // Тут буде запит до API для отримання даних користувача
-      // Поки що використовуємо мокові дані
-      setUser({
-        id: "1",
-        name: "Іван Петренко",
-        email: "user@example.com",
-        location: "Київ, Україна",
-        bio: "Активний волонтер з 5-річним досвідом",
-        avatar: "/photo_2024-04-18_02-14-36.jpg",
-      });
-      setIsAuthenticated(true);
-    }
+  const logout = useCallback(() => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setUser(null);
+    setIsAuthenticated(false);
+    logger.info("User logged out");
   }, []);
+
+  const loadUserInfo = useCallback(async () => {
+    try {
+      const userInfo = await authService.getUserInfo();
+      setUser(userInfo);
+      setIsAuthenticated(true);
+      logger.info("User info loaded", { userId: userInfo.id });
+    } catch (error) {
+      logger.error("Failed to load user info", { error });
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  }, [logout]);
 
   const login = async (email: string, password: string) => {
     try {
-      // Тут буде реальний запит до API
-      // Поки що імітуємо успішний вхід
-      const token = "mock-token";
-      localStorage.setItem("token", token);
+      setLoading(true);
+      logger.info("Attempting login", { email });
+      const response = await authService.login({ email, password });
 
-      setUser({
-        id: "1",
-        name: "Іван Петренко",
-        email: email,
-        location: "Київ, Україна",
-        bio: "Активний волонтер з 5-річним досвідом",
-        avatar: "/photo_2024-04-18_02-14-36.jpg",
-      });
-      setIsAuthenticated(true);
-      navigate("/profile");
+      localStorage.setItem("accessToken", response.accessToken);
+      localStorage.setItem("refreshToken", response.refreshToken);
+
+      await loadUserInfo();
+      logger.success("Login successful", { email });
     } catch (error) {
-      console.error("Помилка при вході:", error);
+      logger.error("Login failed", { error, email });
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (email: string, password: string) => {
     try {
-      // Тут буде реальний запит до API
-      // Поки що імітуємо успішну реєстрацію
-      const token = "mock-token";
-      localStorage.setItem("token", token);
-
-      setUser({
-        id: "1",
-        name: name,
-        email: email,
-        location: "Київ, Україна",
-        bio: "Новий волонтер",
-        avatar: "/default-avatar.jpg",
-      });
-      setIsAuthenticated(true);
-      navigate("/profile");
+      setLoading(true);
+      logger.info("Attempting registration", { email });
+      await authService.register({ email, password });
+      logger.success("Registration successful", { email });
     } catch (error) {
-      console.error("Помилка при реєстрації:", error);
+      logger.error("Registration failed", { error, email });
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    setIsAuthenticated(false);
-    navigate("/");
-  };
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      loadUserInfo();
+    } else {
+      setLoading(false);
+    }
+  }, [loadUserInfo]);
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, login, register, logout }}
+      value={{
+        user,
+        isAuthenticated,
+        loading,
+        login,
+        register,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
