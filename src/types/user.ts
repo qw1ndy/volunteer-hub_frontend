@@ -1,13 +1,18 @@
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
+  avatar?: string;
   location?: string;
   bio?: string;
-  avatar?: string;
   skills?: string[];
-  events?: UserEvent[];
-  organizations?: UserOrganization[];
+  stats: {
+    events: number;
+    hours: number;
+    organizations: number;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserEvent {
